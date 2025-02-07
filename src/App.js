@@ -36,6 +36,7 @@ function App() {
   const adminEmail = process.env.REACT_APP_ADMIN_EMAIL;
   const eaglesLogo = process.env.PUBLIC_URL + "/eagles.png";
   const chiefsLogo = process.env.PUBLIC_URL + "/chiefs.png";
+  const bowlLogo = process.env.PUBLIC_URL + "/lix.png";
 
   // ----- Authentication -----
   const provider = new GoogleAuthProvider();
@@ -607,9 +608,11 @@ function App() {
 
   // ----- Main Render -----
   return (
-    <div className="container mt-4">
+    <div className="container-fluid mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h1>Super Bowl LIX Squares (Chiefs vs. Eagles)</h1>
+        <h1>
+          <img src={bowlLogo} alt="Super Bowl LIX" style={{ width: "50px", marginRight: "20px" }} />
+          Super Bowl LIX Squares (Chiefs vs. Eagles)</h1>
         <div>
           {user ? (
             <>
