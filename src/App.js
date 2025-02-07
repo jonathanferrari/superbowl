@@ -46,6 +46,7 @@ function App() {
       console.error("Error during sign in:", error);
     }
   };
+
   const handleSignOut = async () => {
     try {
       await signOut(auth);
@@ -53,6 +54,7 @@ function App() {
       console.error("Error during sign out:", error);
     }
   };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -105,9 +107,16 @@ function App() {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
-  // Determine a consistent color for a given user (based on their userId)
+  // Determine a consistent color for a given user (up to 20 colors)
   const getColorForUser = (userId) => {
-    const colors = ["#007bff", "#28a745", "#dc3545", "#ffc107", "#17a2b8", "#6f42c1", "#fd7e14", "#20c997", "#343a40", "#e83e8c"];
+    // 20 distinct color codes:
+    const colors = [
+      "#007bff", "#28a745", "#dc3545", "#ffc107", "#17a2b8",
+      "#6f42c1", "#fd7e14", "#20c997", "#343a40", "#e83e8c",
+      "#6610f2", "#02b875", "#5c3d99", "#ffa500", "#bada55",
+      "#ff1493", "#000000", "#a83232", "#00008b", "#808000"
+    ];
+
     let hash = 0;
     for (let i = 0; i < userId.length; i++) {
       hash = userId.charCodeAt(i) + ((hash << 5) - hash);
@@ -117,13 +126,19 @@ function App() {
   };
 
   // ----- Square Selection / Deselection -----
-  // Allow users to select a square; if the square is already selected by them, allow deselection.
+  // Prevent modifications once the game has started.
   const handleSquareClick = async (row, col) => {
+    // If the axes exist, the game is started, so don't allow changes.
+    if (configData.axes) {
+      alert("The game has started; you can no longer select or deselect squares.");
+      return;
+    }
+
     const key = `${row}_${col}`;
     const square = squaresData[key];
     if (square) {
+      // If the current user is the owner, allow deselection
       if (user && square.userId === user.uid) {
-        // Deselect the square.
         try {
           await deleteDoc(doc(db, "squares", key));
         } catch (error) {
@@ -134,10 +149,13 @@ function App() {
       }
       return;
     }
+
     if (!user) {
       alert("Please sign in to select a square.");
       return;
     }
+
+    // Otherwise, select the square.
     try {
       await setDoc(doc(db, "squares", key), {
         userId: user.uid,
@@ -152,8 +170,17 @@ function App() {
   };
 
   // ----- Admin Functions -----
-  // "Start Game" sets (or resets) the axes for both teams.
+  // "Start Game" sets (or resets) the axes for both teams, only if all squares are filled.
   const handleStartGame = async () => {
+    const totalSquares = 100;
+    const filledSquares = Object.keys(squaresData).length;
+
+    // Require all squares to be filled before starting.
+    if (filledSquares < totalSquares) {
+      alert("All 100 squares must be filled before starting the game.");
+      return;
+    }
+
     try {
       const axes = {
         eagles: generateRandomAxis(),
@@ -224,6 +251,7 @@ function App() {
         deletePromises.push(deleteDoc(docSnap.ref));
       });
       await Promise.all(deletePromises);
+
       // Clear the config document.
       await setDoc(doc(db, "config", "game"), {}, { merge: false });
       alert("Game restarted!");
@@ -233,19 +261,20 @@ function App() {
   };
 
   // ----- Compute Quarter Winner -----
-  // For a given quarter, determine the winning square by using the last digit
-  // of each team’s score and matching against the axes.
+  // For a given quarter, determine the winning square by matching last-digit of each team's score vs. the axes.
   const computeWinnerForQuarter = (quarter) => {
     if (!configData.axes || !configData.scores || !configData.scores[quarter]) return null;
     const scoreData = configData.scores[quarter];
     const eaglesScore = parseInt(scoreData.eagles);
     const chiefsScore = parseInt(scoreData.chiefs);
     if (isNaN(eaglesScore) || isNaN(chiefsScore)) return null;
+
     const eaglesLast = eaglesScore % 10;
     const chiefsLast = chiefsScore % 10;
     const col = configData.axes.eagles.indexOf(eaglesLast);
     const row = configData.axes.chiefs.indexOf(chiefsLast);
     if (col === -1 || row === -1) return null;
+
     const key = `${row}_${col}`;
     const square = squaresData[key];
     return { row, col, square };
@@ -253,47 +282,25 @@ function App() {
 
   // ----- Render Functions -----
   // Render the game grid.
-  // The grid is always 10×10 (the squares remain blank if no one has claimed them).
-  // The axes (digits) and logos are displayed outside of the squares as labels.
-  // Only the renderGrid function with updated Eagles and Chiefs digit styles:
-
   const renderGrid = () => {
     // If configData.axes doesn’t exist yet, show blank digits.
     const eaglesAxis = configData.axes ? configData.axes.eagles : Array(10).fill("");
     const chiefsAxis = configData.axes ? configData.axes.chiefs : Array(10).fill("");
-  
+
     return (
       <table
         className="table table-bordered mx-auto"
         style={{ maxWidth: "100%", maxHeight: "100%", tableLayout: "fixed" }}
       >
         <thead>
-          {/* Row 1 (12 columns total): corner + blank + Eagles (colSpan=10) */}
+          {/* Top row for Eagles label */}
           <tr>
-            {/* Corner cell (no border) */}
-            <th
-              style={{
-                border: "none",
-                borderWidth: 0,
-                width: "60px"
-              }}
-            />
-            {/* Second blank cell (no border) */}
-            <th
-              style={{
-                border: "none",
-                borderWidth: 0,
-                width: "60px"
-              }}
-            />
-            {/* Eagles cell (remove top/bottom borders via custom CSS class) */}
+            <th style={{ border: "none", borderWidth: 0, width: "60px" }} />
+            <th style={{ border: "none", borderWidth: 0, width: "60px" }} />
             <th
               colSpan="10"
               className="no-border"
-              style={{
-                borderLeft: "none",
-                borderRight: "none"
-              }}
+              style={{ borderLeft: "none", borderRight: "none" }}
             >
               <div
                 className="text-center"
@@ -317,26 +324,16 @@ function App() {
               </div>
             </th>
           </tr>
-  
-          {/* Row 2 (12 columns total): corner + blank + 10 Eagles digits */}
+          {/* Row for Eagles digits */}
           <tr>
-            {/* First corner cell (remove border) */}
-            <th className="no-border"
-              style={{
-                border: "none",
-                borderWidth: 0,
-                width: "60px"
-              }}
+            <th
+              className="no-border"
+              style={{ border: "none", borderWidth: 0, width: "60px" }}
             />
-            {/* Second corner cell (remove border) */}
-            <th className="no-border"
-              style={{
-                border: "none",
-                borderWidth: 0,
-                width: "60px"
-              }}
+            <th
+              className="no-border"
+              style={{ border: "none", borderWidth: 0, width: "60px" }}
             />
-            {/* Eagles digits (background: #004C54, color: #A5ACAF) */}
             {eaglesAxis.map((digit, idx) => (
               <th
                 key={idx}
@@ -353,14 +350,9 @@ function App() {
             ))}
           </tr>
         </thead>
-  
         <tbody>
           {chiefsAxis.map((chiefsDigit, rowIndex) => (
             <tr key={rowIndex}>
-              {/*
-                For the first row only, insert one <th> that uses rowSpan=10.
-                Remove top/bottom borders via custom CSS class.
-              */}
               {rowIndex === 0 && (
                 <th
                   rowSpan="10"
@@ -397,8 +389,7 @@ function App() {
                   </div>
                 </th>
               )}
-  
-              {/* Chiefs digit cell (background: #D01F2F, color: #000000) */}
+              {/* Chiefs digit cell */}
               <th
                 className="text-center align-middle"
                 style={{
@@ -410,8 +401,7 @@ function App() {
               >
                 {chiefsDigit}
               </th>
-  
-              {/* Columns 3–12: the 10 squares */}
+              {/* 10 squares (cols) */}
               {Array.from({ length: 10 }).map((_, colIndex) => {
                 const key = `${rowIndex}_${colIndex}`;
                 const square = squaresData[key];
@@ -442,11 +432,7 @@ function App() {
       </table>
     );
   };
-  
-  
 
-  
-  
   // Render the Players tab – tally squares claimed per user.
   const renderPlayersTab = () => {
     const playerCounts = {};
@@ -462,6 +448,7 @@ function App() {
       name: playerCounts[userId].name,
       count: playerCounts[userId].count
     }));
+
     return (
       <div className="container">
         <h3>Players &amp; Squares Count</h3>
@@ -480,6 +467,7 @@ function App() {
                   {getInitials(player.name)} - {player.name}
                 </td>
                 <td>{player.count}</td>
+                {/* Assuming $1/square: */}
                 <td>{player.count}</td>
               </tr>
             ))}
@@ -544,6 +532,7 @@ function App() {
             <span className="badge bg-success">Game Started</span>
           )}
         </div>
+
         {/* Set Payouts Section */}
         <div className="mb-4">
           <h5>Set Payouts (Total must equal $100)</h5>
@@ -565,6 +554,7 @@ function App() {
             <button type="submit" className="btn btn-secondary mt-2">Save Payouts</button>
           </form>
         </div>
+
         {/* Enter Scores Section */}
         <div className="mb-4">
           <h5>Enter Quarter Scores</h5>
@@ -596,6 +586,7 @@ function App() {
             <button type="submit" className="btn btn-secondary">Save Scores</button>
           </form>
         </div>
+
         {/* Restart Game Section */}
         <div className="mb-4">
           <h5>Restart Game</h5>
@@ -640,17 +631,37 @@ function App() {
       {/* Navigation Tabs */}
       <ul className="nav nav-tabs mb-3">
         <li className="nav-item">
-          <button className={`nav-link ${activeTab === "game" ? "active" : ""}`} onClick={() => setActiveTab("game")}>Game</button>
+          <button
+            className={`nav-link ${activeTab === "game" ? "active" : ""}`}
+            onClick={() => setActiveTab("game")}
+          >
+            Game
+          </button>
         </li>
         <li className="nav-item">
-          <button className={`nav-link ${activeTab === "players" ? "active" : ""}`} onClick={() => setActiveTab("players")}>Players</button>
+          <button
+            className={`nav-link ${activeTab === "players" ? "active" : ""}`}
+            onClick={() => setActiveTab("players")}
+          >
+            Players
+          </button>
         </li>
         <li className="nav-item">
-          <button className={`nav-link ${activeTab === "results" ? "active" : ""}`} onClick={() => setActiveTab("results")}>Results</button>
+          <button
+            className={`nav-link ${activeTab === "results" ? "active" : ""}`}
+            onClick={() => setActiveTab("results")}
+          >
+            Results
+          </button>
         </li>
         {user && user.email === adminEmail && (
           <li className="nav-item">
-            <button className={`nav-link ${activeTab === "admin" ? "active" : ""}`} onClick={() => setActiveTab("admin")}>Admin</button>
+            <button
+              className={`nav-link ${activeTab === "admin" ? "active" : ""}`}
+              onClick={() => setActiveTab("admin")}
+            >
+              Admin
+            </button>
           </li>
         )}
       </ul>
