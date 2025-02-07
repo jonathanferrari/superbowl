@@ -342,7 +342,6 @@ function App() {
                 style={{
                   backgroundColor: "#004C54",
                   color: "#A5ACAF",
-                  width: "50px",
                   fontSize: "1.2rem"
                 }}
               >
@@ -412,7 +411,6 @@ function App() {
                     onClick={() => handleSquareClick(rowIndex, colIndex)}
                     className="text-center align-middle"
                     style={{
-                      width: "50px",
                       cursor: square ? "default" : "pointer",
                       backgroundColor: square
                         ? getColorForUser(square.userId)
