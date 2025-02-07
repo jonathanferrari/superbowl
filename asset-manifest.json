@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/superbowl/static/css/main.49faa5e3.css",
+    "main.js": "/superbowl/static/js/main.247a2bb8.js",
+    "index.html": "/superbowl/index.html",
+    "main.49faa5e3.css.map": "/superbowl/static/css/main.49faa5e3.css.map",
+    "main.247a2bb8.js.map": "/superbowl/static/js/main.247a2bb8.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.49faa5e3.css",
+    "static/js/main.247a2bb8.js"
+  ]
+}
