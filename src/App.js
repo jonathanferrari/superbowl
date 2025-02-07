@@ -291,7 +291,7 @@ function App() {
       <div className="table-responsive">
       <table
         className="table table-bordered mx-auto"
-        style={{ maxWidth: "100%", maxHeight: "100%", tableLayout: "fixed" }}
+        style={{ maxWidth: "100%", maxHeight: "80%", tableLayout: "fixed" }}
       >
         <thead>
           {/* Top row for Eagles label */}
@@ -418,7 +418,8 @@ function App() {
                       color: square ? "#fff" : "#000",
                       fontWeight: "bold",
                       userSelect: "none",
-                      minHeight: "50px"
+                      minHeight: "50px",
+                      maxHeight: "50px"
                     }}
                   >
                     {square ? getInitials(square.userName) : ""}
