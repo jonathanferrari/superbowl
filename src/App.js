@@ -33,7 +33,7 @@ function App() {
   });
 
   // ----- Constants & Logos -----
-  const adminEmail = process.env.REACT_APP_ADMIN_EMAIL;
+  const adminEmail = "jonathanferrari602@gmail.com";
   const eaglesLogo = process.env.PUBLIC_URL + "/eagles.png";
   const chiefsLogo = process.env.PUBLIC_URL + "/chiefs.png";
 
