@@ -288,6 +288,7 @@ function App() {
     const chiefsAxis = configData.axes ? configData.axes.chiefs : Array(10).fill("");
 
     return (
+      <div className="table-responsive">
       <table
         className="table table-bordered mx-auto"
         style={{ maxWidth: "100%", maxHeight: "100%", tableLayout: "fixed" }}
@@ -430,6 +431,7 @@ function App() {
           ))}
         </tbody>
       </table>
+    </div>
     );
   };
 
