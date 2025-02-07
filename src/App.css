@@ -1,0 +1,74 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.corner-1-1 {
+  /* Removes the top border above the 1st row, 1st cell,
+     and the bottom border between row1 col1 & row2 col1. */
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+}
+
+.corner-1-2 {
+  /* Removes top border above 1st row, 2nd cell,
+     and the bottom border between row1 col2 & row2 col2. */
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+}
+
+.eagles-logo-cell {
+  /* Removes top border above the eagles logo cell (row1 col3). */
+  border-top: 0 !important;
+}
+
+.corner-2-1 {
+  /* Removes bottom border between row2 col1 & row3 col1 (tbody). */
+  border-bottom: 0 !important;
+}
+
+.corner-2-2 {
+  /* Removes bottom border between row2 col2 & row3 col2 (tbody). */
+  border-bottom: 0 !important;
+}
+
+.chiefs-logo-cell {
+  /* Removes bottom border below the big Chiefs logo cell (row3 col1). */
+  border-bottom: 0 !important;
+}
+
+
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
