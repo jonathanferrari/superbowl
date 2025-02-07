@@ -13,38 +13,41 @@
   }
 }
 
-.corner-1-1 {
-  /* Removes the top border above the 1st row, 1st cell,
-     and the bottom border between row1 col1 & row2 col1. */
-  border-top: 0 !important;
-  border-bottom: 0 !important;
+/* Base styling for team text */
+.team-text {
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 2;
 }
 
-.corner-1-2 {
-  /* Removes top border above 1st row, 2nd cell,
-     and the bottom border between row1 col2 & row2 col2. */
-  border-top: 0 !important;
-  border-bottom: 0 !important;
+/* If you specifically want to reduce the “line breaks” spacing on the Chiefs text */
+.chiefs-vertical {
+  line-height: 2; /* default on large screens */
 }
 
-.eagles-logo-cell {
-  /* Removes top border above the eagles logo cell (row1 col3). */
-  border-top: 0 !important;
+/* Example: smaller logos */
+.chiefs-logo, .eagles-logo {
+  width: 50px; /* default for large screens */
+  margin-right: 20px;
 }
 
-.corner-2-1 {
-  /* Removes bottom border between row2 col1 & row3 col1 (tbody). */
-  border-bottom: 0 !important;
-}
+/* ---------- MEDIA QUERY for small screens ---------- */
+@media (max-width: 576px) {
+  .team-text {
+    font-size: 1rem !important; /* smaller text on mobile */
+    line-height: 1.4 !important; /* tighten spacing */
+  }
 
-.corner-2-2 {
-  /* Removes bottom border between row2 col2 & row3 col2 (tbody). */
-  border-bottom: 0 !important;
-}
+  /* Make the CHIEFS line-break text even tighter on mobile */
+  .chiefs-vertical {
+    line-height: 1 !important;
+  }
 
-.chiefs-logo-cell {
-  /* Removes bottom border below the big Chiefs logo cell (row3 col1). */
-  border-bottom: 0 !important;
+  /* Smaller logos on mobile */
+  .chiefs-logo, .eagles-logo {
+    width: 35px !important;
+    margin-right: 10px !important;
+  }
 }
 
 

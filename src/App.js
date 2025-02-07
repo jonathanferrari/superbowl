@@ -360,25 +360,18 @@ function App() {
                   style={{
                     borderLeft: "none",
                     borderRight: "none",
-                    verticalAlign: "top",
-                    width: "60px",
-                    paddingTop: "50px"
+                    verticalAlign: "middle",
+                    width: "60px"
                   }}
                 >
                   <div className="text-center">
                     <img
                       src={chiefsLogo}
                       alt="Chiefs"
+                      className="chiefs-logo" 
                       style={{ width: "50px" }}
                     />
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        marginTop: "20px",
-                        lineHeight: "2"
-                      }}
-                    >
+                    <div className="team-text chiefs-vertical" style={{ fontSize: "1.5rem" }}>
                       C<br />
                       H<br />
                       I<br />
@@ -418,8 +411,7 @@ function App() {
                       color: square ? "#fff" : "#000",
                       fontWeight: "bold",
                       userSelect: "none",
-                      minHeight: "50px",
-                      maxHeight: "50px"
+                      height: "2rem",
                     }}
                   >
                     {square ? getInitials(square.userName) : ""}
